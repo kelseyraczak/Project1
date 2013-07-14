@@ -1,0 +1,157 @@
+<!--
+
+	N222/Project 1
+
+	***** Emily Anderson ******
+
+	***** Kelsey Raczak *******
+
+	07/15/2013
+
+-->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Project One</title>
+        	<link href="css/style.css" rel="stylesheet" type="text/css">
+			<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400' rel='stylesheet' type='text/css'>
+			<!-- Youtube API -->
+			<script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+			<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+			<script src="js/jquery.min.js"></script>
+
+
+		<script type="text/javascript">
+
+		var params = { allowScriptAccess: "always" };
+		var atts = { id: "myytplayer" };
+		swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1",
+					   "tubePlayer", "425", "356", "8", null, null, params, atts);
+
+		var player;
+		function onYouTubePlayerReady(id) {
+			console.log("runs");
+			player = $("#myytplayer").get(0);
+		}
+
+		var loadedData;
+        var url = "http://gdata.youtube.com/feeds/api/videos?max-results=20&alt=json&q=";
+
+
+
+
+		// Function to populate search results in #res div
+		function listResults(url) {
+
+			$.getJSON(url, function( data ) {
+
+				// Logging current url
+				console.log("url: " + url);
+
+				// Adding JSON data to global loadedData
+				loadedData = data;
+
+				// Clear #res div before listing results.
+				$("#res").html("");
+
+				// Iterating over array
+				$.each( data.feed.entry, function( key, value ) {
+
+					var nodeUrl = value.id.$t.replace("http://gdata.youtube.com/feeds/api/videos/", "")
+
+					$("#res").append("<p data-url='" + nodeUrl + "' >" + (key + 1) + ". " + value.title.$t + "<span class='searchItems'> + </span></p>");
+
+
+                            $("p").on("click", function() {
+                                player.loadVideoById($(this).data("url"), 0, "default");
+                            });
+
+
+
+					$(".searchItems").click(function() {
+							$("#divB").append( "<li>"+ "<span class='removeItems'> - </span>" + "<p data-url='" + nodeUrl + "' >" + (key + 1) + ". " + value.title.$t + "</p>" + "</li>");
+
+					//Remove playlist Video
+                            $("li span").click(function(e) {
+                                $(this).parent().remove();
+
+
+                            });
+					end();
+
+					});
+				});
+			});
+		};
+
+
+		// executes when docuement loads
+		$(document).ready(function(e) {
+
+
+			// SEARCH FUNCTION
+			$("#searchButton").click(function() {
+        		//var url = "http://gdata.youtube.com/feeds/api/videos?max-results=20&alt=json&q=";
+				console.log("clicked");
+
+				listResults(url + $("#searchText").val());
+
+				});
+			});
+
+
+     </script>
+
+
+    </head>
+
+
+
+	    <body> <!-----------   START BODY   -------------->
+
+
+
+
+       		<div id="divA" class="col"> <!-- #divA START ------>
+	   			<form action='/search' id='searchForm' method='get' target='_top'>
+		   			<input id='searchText' placeholder='Search Videos...' type='text' />
+		   			<input id='searchButton' type='button' value='Search' />
+		   		</form> <!-- #divA  END------>
+		   	</div>
+
+		   				<h2>Search Results:</h2>
+
+		   	<div id="res"></div> <!-- RESULTS DIV -->
+
+		   	<div id="ytplayer"><!-- Holds YouTube Player --></div>
+
+
+		   	<div>
+       			 <ul id="divB"><!-- #divB  START----->
+	   			 	<h2 style="padding: 20px; padding-top: 0px; opacity: 1;">Your Playlist:</h2>
+	   			 </ul><!-- #divB  END----->
+	   		</div>
+
+
+
+
+	   		<script>
+		            var tag = document.createElement('script');
+		            tag.src = "https://www.youtube.com/player_api";
+		            var firstScriptTag = document.getElementsByTagName('script')[0];
+		            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+		            var player;
+
+		            function onYouTubePlayerAPIReady() {
+		                player = new YT.Player('ytplayer', {
+		                    height: '354',
+		                    width: '650',
+		                    videoId: ''
+		                });
+		            }
+			</script>
+
+		</body><!-----------   END BODY  --------------->
+</html>
